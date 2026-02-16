@@ -1,683 +1,244 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pac-Man Game</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paul Baker | QA Test Analyst</title>
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            color: white;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
 
-        .game-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
+<style>
 
-        .score-board {
-            display: flex;
-            gap: 40px;
-            margin-bottom: 20px;
-            font-size: 24px;
-            font-weight: bold;
-        }
+body{
+font-family:'Inter',sans-serif;
+margin:0;
+background:#0f1115;
+color:#fff;
+}
 
-        #gameCanvas {
-            border: 4px solid #2563eb;
-            background-color: #000;
-            image-rendering: pixelated;
-        }
+.container{
+max-width:1100px;
+margin:auto;
+padding:40px 20px;
+}
 
-        .controls {
-            margin-top: 20px;
-            text-align: center;
-        }
+h1,h2,h3{
+margin-top:0;
+}
 
-        .controls div {
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
+header{
+background:linear-gradient(135deg,#000,#1b1e26);
+text-align:center;
+padding:80px 20px;
+}
 
-        .controls .hint {
-            font-size: 12px;
-            color: #9ca3af;
-            margin-top: 10px;
-        }
+header h1{
+font-size:3em;
+}
 
-        .touch-controls {
-            display: none;
-            margin-top: 20px;
-            position: relative;
-            width: 200px;
-            height: 200px;
-        }
+.hero-sub{
+color:#bbb;
+font-size:1.2em;
+margin-top:10px;
+}
 
-        @media (max-width: 768px) {
-            .touch-controls {
-                display: block;
-            }
+.btn{
+display:inline-block;
+margin-top:20px;
+padding:12px 20px;
+background:#e63946;
+color:#fff;
+text-decoration:none;
+border-radius:6px;
+}
 
-            .controls div:first-child {
-                display: none;
-            }
+section{
+margin-top:50px;
+}
 
-            .score-board {
-                font-size: 18px;
-                gap: 20px;
-            }
+.card{
+background:#161922;
+padding:25px;
+border-radius:10px;
+margin-bottom:20px;
+}
 
-            #gameCanvas {
-                max-width: 100%;
-                height: auto;
-            }
+.skills{
+display:flex;
+flex-wrap:wrap;
+}
 
-            .game-container {
-                padding: 10px;
-            }
-        }
+.skill{
+background:#1f2430;
+padding:10px 15px;
+margin:6px;
+border-radius:6px;
+font-size:0.9em;
+}
 
-        .touch-button {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            background-color: #2563eb;
-            border: 3px solid #1e40af;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-            cursor: pointer;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
+.timeline{
+border-left:2px solid #e63946;
+padding-left:20px;
+}
 
-        .touch-button:active {
-            background-color: #1e40af;
-            transform: scale(0.95);
-        }
+.timeline-item{
+margin-bottom:30px;
+}
 
-        .btn-up {
-            top: 0;
-            left: 70px;
-        }
+footer{
+background:#000;
+text-align:center;
+padding:30px;
+margin-top:60px;
+color:#888;
+}
 
-        .btn-down {
-            bottom: 0;
-            left: 70px;
-        }
+a{
+color:#e63946;
+}
 
-        .btn-left {
-            top: 70px;
-            left: 0;
-        }
-
-        .btn-right {
-            top: 70px;
-            right: 0;
-        }
-
-        .game-over-screen {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.95);
-            padding: 40px 60px;
-            border-radius: 10px;
-            text-align: center;
-            display: none;
-            z-index: 1000;
-        }
-
-        .game-over-screen.show {
-            display: block;
-        }
-
-        .game-over-screen h1 {
-            font-size: 48px;
-            color: #fbbf24;
-            margin-bottom: 20px;
-        }
-
-        .game-over-screen p {
-            font-size: 24px;
-            margin-bottom: 30px;
-        }
-
-        .restart-button {
-            padding: 15px 30px;
-            font-size: 18px;
-            font-weight: bold;
-            background-color: #fbbf24;
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .restart-button:hover {
-            background-color: #fcd34d;
-        }
-    </style>
+</style>
 </head>
+
 <body>
-    <div class="game-container">
-        <div class="score-board">
-            <div>SCORE: <span id="score">0</span></div>
-            <div>LIVES: <span id="lives">❤️❤️❤️</span></div>
-        </div>
-        
-        <canvas id="gameCanvas"></canvas>
-        
-        <div class="controls">
-            <div>Use Arrow Keys or WASD to move</div>
-            <div class="hint">Eat all pellets to win! Avoid ghosts or eat power pellets to chase them!</div>
-        </div>
 
-        <div class="touch-controls">
-            <div class="touch-button btn-up" id="btnUp">▲</div>
-            <div class="touch-button btn-down" id="btnDown">▼</div>
-            <div class="touch-button btn-left" id="btnLeft">◀</div>
-            <div class="touch-button btn-right" id="btnRight">▶</div>
-        </div>
-    </div>
+<header>
 
-    <div id="gameOverScreen" class="game-over-screen">
-        <h1 id="gameOverTitle">GAME OVER</h1>
-        <p>Final Score: <span id="finalScore">0</span></p>
-        <button class="restart-button" onclick="restartGame()">PLAY AGAIN</button>
-    </div>
+<h1>Paul Baker</h1>
+<p class="hero-sub">QA Test Analyst | Web & Mobile Testing | Automation | Accessibility</p>
 
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        const CELL_SIZE = 20;
-        const GRID_WIDTH = 28;
-        const GRID_HEIGHT = 31;
-        
-        canvas.width = GRID_WIDTH * CELL_SIZE;
-        canvas.height = GRID_HEIGHT * CELL_SIZE;
+<a href="#contact" class="btn">Contact Me</a>
 
-        // Game state
-        let score = 0;
-        let lives = 3;
-        let gameOver = false;
-        let gameWon = false;
-        let powerMode = false;
-        let powerModeTimer = null;
-        let gameLoop = null;
+</header>
 
-        // Pac-Man
-        let pacman = {
-            x: 14,
-            y: 23,
-            direction: 'right',
-            nextDirection: 'right'
-        };
 
-        // Ghosts
-        let ghosts = [
-            { x: 13, y: 14, color: '#FF0000', direction: 'up', scared: false },
-            { x: 14, y: 14, color: '#FFB8FF', direction: 'down', scared: false },
-            { x: 13, y: 15, color: '#00FFFF', direction: 'left', scared: false },
-            { x: 14, y: 15, color: '#FFB852', direction: 'right', scared: false }
-        ];
+<div class="container">
 
-        // Maze (1 = wall, 0 = path, 2 = pellet, 3 = power pellet)
-        let maze = [
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,1],
-            [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
-            [1,3,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,3,1],
-            [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
-            [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-            [1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1],
-            [1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1],
-            [1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1],
-            [1,1,1,1,1,1,2,1,1,1,1,1,0,1,1,0,1,1,1,1,1,2,1,1,1,1,1,1],
-            [1,1,1,1,1,1,2,1,1,1,1,1,0,1,1,0,1,1,1,1,1,2,1,1,1,1,1,1],
-            [1,1,1,1,1,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,1,1,1,1,1],
-            [1,1,1,1,1,1,2,1,1,0,1,1,1,0,0,1,1,1,0,1,1,2,1,1,1,1,1,1],
-            [1,1,1,1,1,1,2,1,1,0,1,0,0,0,0,0,0,1,0,1,1,2,1,1,1,1,1,1],
-            [0,0,0,0,0,0,2,0,0,0,1,0,0,0,0,0,0,1,0,0,0,2,0,0,0,0,0,0],
-            [1,1,1,1,1,1,2,1,1,0,1,0,0,0,0,0,0,1,0,1,1,2,1,1,1,1,1,1],
-            [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
-            [1,1,1,1,1,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,1,1,1,1,1],
-            [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
-            [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
-            [1,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,1],
-            [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
-            [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
-            [1,3,2,2,1,1,2,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2,1,1,2,2,3,1],
-            [1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1],
-            [1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1],
-            [1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1],
-            [1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1],
-            [1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1],
-            [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-        ];
+<section>
 
-        function createMaze() {
-            return [
-                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                [1,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,1],
-                [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
-                [1,3,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,3,1],
-                [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
-                [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-                [1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1],
-                [1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1],
-                [1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1],
-                [1,1,1,1,1,1,2,1,1,1,1,1,0,1,1,0,1,1,1,1,1,2,1,1,1,1,1,1],
-                [1,1,1,1,1,1,2,1,1,1,1,1,0,1,1,0,1,1,1,1,1,2,1,1,1,1,1,1],
-                [1,1,1,1,1,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,1,1,1,1,1],
-                [1,1,1,1,1,1,2,1,1,0,1,1,1,0,0,1,1,1,0,1,1,2,1,1,1,1,1,1],
-                [1,1,1,1,1,1,2,1,1,0,1,0,0,0,0,0,0,1,0,1,1,2,1,1,1,1,1,1],
-                [0,0,0,0,0,0,2,0,0,0,1,0,0,0,0,0,0,1,0,0,0,2,0,0,0,0,0,0],
-                [1,1,1,1,1,1,2,1,1,0,1,0,0,0,0,0,0,1,0,1,1,2,1,1,1,1,1,1],
-                [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
-                [1,1,1,1,1,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,1,1,1,1,1],
-                [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
-                [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
-                [1,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,1],
-                [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
-                [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
-                [1,3,2,2,1,1,2,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2,1,1,2,2,3,1],
-                [1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1],
-                [1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1],
-                [1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1],
-                [1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1],
-                [1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1],
-                [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-            ];
-        }
+<div class="card">
 
-        function isWall(x, y) {
-            if (y < 0 || y >= GRID_HEIGHT || x < 0 || x >= GRID_WIDTH) return true;
-            return maze[y][x] === 1;
-        }
+<h2>About Me</h2>
 
-        function movePacman() {
-            let newX = pacman.x;
-            let newY = pacman.y;
-            let direction = pacman.nextDirection;
+<p>
 
-            // Try to move in the next direction first
-            let tryX = pacman.x;
-            let tryY = pacman.y;
-            
-            switch (pacman.nextDirection) {
-                case 'up': tryY--; break;
-                case 'down': tryY++; break;
-                case 'left': tryX--; break;
-                case 'right': tryX++; break;
-            }
+Test Analyst with 10+ years experience delivering quality across complex enterprise and agency environments.
+Strong in manual testing, automation with Selenium, accessibility auditing, and Agile collaboration.
 
-            // If next direction is valid, use it
-            if (!isWall(tryX, tryY)) {
-                newX = tryX;
-                newY = tryY;
-                direction = pacman.nextDirection;
-            } else {
-                // Otherwise try current direction
-                switch (pacman.direction) {
-                    case 'up': newY = pacman.y - 1; break;
-                    case 'down': newY = pacman.y + 1; break;
-                    case 'left': newX = pacman.x - 1; break;
-                    case 'right': newX = pacman.x + 1; break;
-                }
-                
-                if (isWall(newX, newY)) {
-                    return; // Can't move
-                }
-            }
+I focus on risk-based testing, improving user experience, and embedding quality throughout delivery.
 
-            // Tunnel wrapping
-            if (newX < 0) newX = GRID_WIDTH - 1;
-            if (newX >= GRID_WIDTH) newX = 0;
+</p>
 
-            pacman.x = newX;
-            pacman.y = newY;
-            pacman.direction = direction;
-        }
+</div>
 
-        function moveGhosts() {
-            ghosts.forEach(ghost => {
-                const directions = ['up', 'down', 'left', 'right'];
-                const possibleDirections = directions.filter(dir => {
-                    let testX = ghost.x;
-                    let testY = ghost.y;
-                    
-                    switch (dir) {
-                        case 'up': testY--; break;
-                        case 'down': testY++; break;
-                        case 'left': testX--; break;
-                        case 'right': testX++; break;
-                    }
-                    
-                    return !isWall(testX, testY);
-                });
+</section>
 
-                if (possibleDirections.length === 0) return;
 
-                // Simple AI: occasionally change direction
-                let newDirection = ghost.direction;
-                if (!possibleDirections.includes(ghost.direction) || Math.random() < 0.1) {
-                    newDirection = possibleDirections[Math.floor(Math.random() * possibleDirections.length)];
-                }
+<section>
 
-                let newX = ghost.x;
-                let newY = ghost.y;
+<div class="card">
 
-                switch (newDirection) {
-                    case 'up': newY--; break;
-                    case 'down': newY++; break;
-                    case 'left': newX--; break;
-                    case 'right': newX++; break;
-                }
+<h2>Core Skills & Tools</h2>
 
-                // Tunnel wrapping
-                if (newX < 0) newX = GRID_WIDTH - 1;
-                if (newX >= GRID_WIDTH) newX = 0;
+<div class="skills">
 
-                ghost.x = newX;
-                ghost.y = newY;
-                ghost.direction = newDirection;
-            });
-        }
+<div class="skill">Manual Testing</div>
+<div class="skill">Exploratory Testing</div>
+<div class="skill">Automation (Selenium)</div>
+<div class="skill">Accessibility Testing (WCAG)</div>
+<div class="skill">Regression Testing</div>
+<div class="skill">JIRA</div>
+<div class="skill">GitLab</div>
+<div class="skill">BrowserStack</div>
+<div class="skill">Drupal</div>
+<div class="skill">Laravel</div>
+<div class="skill">WordPress</div>
+<div class="skill">Mobile Testing (iOS/Android)</div>
 
-        function checkCollisions() {
-            // Check pellet collection
-            const cell = maze[pacman.y][pacman.x];
-            
-            if (cell === 2) {
-                maze[pacman.y][pacman.x] = 0;
-                score += 10;
-                updateScore();
-            } else if (cell === 3) {
-                maze[pacman.y][pacman.x] = 0;
-                score += 50;
-                updateScore();
-                powerMode = true;
-                ghosts.forEach(ghost => ghost.scared = true);
-                
-                if (powerModeTimer) clearTimeout(powerModeTimer);
-                powerModeTimer = setTimeout(() => {
-                    powerMode = false;
-                    ghosts.forEach(ghost => ghost.scared = false);
-                }, 7000);
-            }
+</div>
 
-            // Check ghost collisions
-            ghosts.forEach(ghost => {
-                if (ghost.x === pacman.x && ghost.y === pacman.y) {
-                    if (ghost.scared) {
-                        score += 200;
-                        updateScore();
-                        // Reset ghost to center
-                        ghost.x = 14;
-                        ghost.y = 14;
-                        ghost.scared = false;
-                    } else {
-                        lives--;
-                        updateLives();
-                        if (lives <= 0) {
-                            endGame(false);
-                        } else {
-                            resetPositions();
-                        }
-                    }
-                }
-            });
+</div>
 
-            // Check win condition
-            const hasRemainingPellets = maze.some(row => row.some(cell => cell === 2 || cell === 3));
-            if (!hasRemainingPellets && !gameWon) {
-                endGame(true);
-            }
-        }
+</section>
 
-        function resetPositions() {
-            pacman = { x: 14, y: 23, direction: 'right', nextDirection: 'right' };
-            ghosts = [
-                { x: 13, y: 14, color: '#FF0000', direction: 'up', scared: false },
-                { x: 14, y: 14, color: '#FFB8FF', direction: 'down', scared: false },
-                { x: 13, y: 15, color: '#00FFFF', direction: 'left', scared: false },
-                { x: 14, y: 15, color: '#FFB852', direction: 'right', scared: false }
-            ];
-        }
 
-        function updateScore() {
-            document.getElementById('score').textContent = score;
-        }
+<section>
 
-        function updateLives() {
-            document.getElementById('lives').textContent = '❤️'.repeat(lives);
-        }
+<div class="card">
 
-        function endGame(won) {
-            gameOver = true;
-            gameWon = won;
-            if (gameLoop) clearInterval(gameLoop);
-            if (powerModeTimer) clearTimeout(powerModeTimer);
-            
-            document.getElementById('gameOverTitle').textContent = won ? 'YOU WIN!' : 'GAME OVER';
-            document.getElementById('finalScore').textContent = score;
-            document.getElementById('gameOverScreen').classList.add('show');
-        }
+<h2>Professional Experience</h2>
 
-        function restartGame() {
-            maze = createMaze();
-            pacman = { x: 14, y: 23, direction: 'right', nextDirection: 'right' };
-            ghosts = [
-                { x: 13, y: 14, color: '#FF0000', direction: 'up', scared: false },
-                { x: 14, y: 14, color: '#FFB8FF', direction: 'down', scared: false },
-                { x: 13, y: 15, color: '#00FFFF', direction: 'left', scared: false },
-                { x: 14, y: 15, color: '#FFB852', direction: 'right', scared: false }
-            ];
-            score = 0;
-            lives = 3;
-            gameOver = false;
-            gameWon = false;
-            powerMode = false;
-            
-            updateScore();
-            updateLives();
-            document.getElementById('gameOverScreen').classList.remove('show');
-            
-            startGame();
-        }
+<div class="timeline">
 
-        function draw() {
-            // Clear canvas
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+<div class="timeline-item">
+<h3>QA Test Analyst — DRPG</h3>
+<p><i>2014 – Present</i></p>
+<ul>
+<li>Led QA delivery across multiple enterprise web and mobile platforms.</li>
+<li>Built and maintained Selenium-based automation frameworks.</li>
+<li>Performed accessibility audits using WCAG guidelines.</li>
+<li>Cross-browser/device testing using BrowserStack.</li>
+<li>Worked within Agile Scrum and Kanban teams.</li>
+<li>Provided UAT support and production validation.</li>
+</ul>
+</div>
 
-            // Draw maze
-            for (let y = 0; y < GRID_HEIGHT; y++) {
-                for (let x = 0; x < GRID_WIDTH; x++) {
-                    const cell = maze[y][x];
-                    
-                    if (cell === 1) {
-                        // Wall
-                        ctx.fillStyle = '#2563eb';
-                        ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-                    } else if (cell === 2) {
-                        // Pellet
-                        ctx.fillStyle = '#fcd34d';
-                        ctx.beginPath();
-                        ctx.arc(x * CELL_SIZE + CELL_SIZE / 2, y * CELL_SIZE + CELL_SIZE / 2, 2, 0, Math.PI * 2);
-                        ctx.fill();
-                    } else if (cell === 3) {
-                        // Power pellet
-                        ctx.fillStyle = '#fcd34d';
-                        ctx.beginPath();
-                        ctx.arc(x * CELL_SIZE + CELL_SIZE / 2, y * CELL_SIZE + CELL_SIZE / 2, 4, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                }
-            }
+<div class="timeline-item">
+<h3>QA / Games Tester — Adecco</h3>
+<ul>
+<li>Functional and regression testing under tight deadlines.</li>
+</ul>
+</div>
 
-            // Draw Pac-Man
-            ctx.fillStyle = '#fbbf24';
-            ctx.beginPath();
-            ctx.arc(
-                pacman.x * CELL_SIZE + CELL_SIZE / 2,
-                pacman.y * CELL_SIZE + CELL_SIZE / 2,
-                CELL_SIZE / 2 - 2,
-                0,
-                Math.PI * 2
-            );
-            ctx.fill();
+<div class="timeline-item">
+<h3>Office Manager — Next Move IT Ltd</h3>
+<ul>
+<li>Operations management and IT administration.</li>
+</ul>
+</div>
 
-            // Draw ghosts
-            ghosts.forEach(ghost => {
-                ctx.fillStyle = ghost.scared ? '#0000FF' : ghost.color;
-                
-                // Ghost body (rounded top)
-                ctx.beginPath();
-                ctx.arc(
-                    ghost.x * CELL_SIZE + CELL_SIZE / 2,
-                    ghost.y * CELL_SIZE + CELL_SIZE / 2 - 2,
-                    CELL_SIZE / 2 - 2,
-                    Math.PI,
-                    0
-                );
-                ctx.lineTo(ghost.x * CELL_SIZE + CELL_SIZE - 2, ghost.y * CELL_SIZE + CELL_SIZE - 2);
-                ctx.lineTo(ghost.x * CELL_SIZE + 2, ghost.y * CELL_SIZE + CELL_SIZE - 2);
-                ctx.closePath();
-                ctx.fill();
+</div>
 
-                // Eyes
-                ctx.fillStyle = '#fff';
-                ctx.fillRect(ghost.x * CELL_SIZE + 5, ghost.y * CELL_SIZE + 6, 3, 3);
-                ctx.fillRect(ghost.x * CELL_SIZE + 12, ghost.y * CELL_SIZE + 6, 3, 3);
-            });
-        }
+</div>
 
-        function gameLoopFunction() {
-            if (!gameOver && !gameWon) {
-                movePacman();
-                moveGhosts();
-                checkCollisions();
-                draw();
-            }
-        }
+</section>
 
-        function startGame() {
-            if (gameLoop) clearInterval(gameLoop);
-            gameLoop = setInterval(gameLoopFunction, 150);
-            draw();
-        }
 
-        // Keyboard controls
-        document.addEventListener('keydown', (e) => {
-            switch (e.key) {
-                case 'ArrowUp':
-                case 'w':
-                case 'W':
-                    pacman.nextDirection = 'up';
-                    e.preventDefault();
-                    break;
-                case 'ArrowDown':
-                case 's':
-                case 'S':
-                    pacman.nextDirection = 'down';
-                    e.preventDefault();
-                    break;
-                case 'ArrowLeft':
-                case 'a':
-                case 'A':
-                    pacman.nextDirection = 'left';
-                    e.preventDefault();
-                    break;
-                case 'ArrowRight':
-                case 'd':
-                case 'D':
-                    pacman.nextDirection = 'right';
-                    e.preventDefault();
-                    break;
-            }
-        });
+<section>
 
-        // Touch controls for mobile
-        function setupTouchControls() {
-            const btnUp = document.getElementById('btnUp');
-            const btnDown = document.getElementById('btnDown');
-            const btnLeft = document.getElementById('btnLeft');
-            const btnRight = document.getElementById('btnRight');
+<div class="card">
 
-            if (btnUp) {
-                btnUp.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    pacman.nextDirection = 'up';
-                });
-                btnUp.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    pacman.nextDirection = 'up';
-                });
-            }
+<h2>Education & Training</h2>
 
-            if (btnDown) {
-                btnDown.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    pacman.nextDirection = 'down';
-                });
-                btnDown.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    pacman.nextDirection = 'down';
-                });
-            }
+<p>HND – Computing & Systems Development</p>
+<p>RSA Advanced Diploma in IT</p>
+<p>HTML & CSS Fundamentals</p>
 
-            if (btnLeft) {
-                btnLeft.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    pacman.nextDirection = 'left';
-                });
-                btnLeft.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    pacman.nextDirection = 'left';
-                });
-            }
+</div>
 
-            if (btnRight) {
-                btnRight.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    pacman.nextDirection = 'right';
-                });
-                btnRight.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    pacman.nextDirection = 'right';
-                });
-            }
-        }
+</section>
 
-        // Setup touch controls
-        setupTouchControls();
 
-        // Start the game
-        startGame();
-    </script>
+<section id="contact">
+
+<div class="card">
+
+<h2>Contact</h2>
+
+<p>Email: Click <a href="mailto:paulbaker445@hotmail.com">here</a> to email me</p>
+<p>LinkedIn: <a href="https://www.linkedin.com/in/paul-baker-pb100">View Profile</a></p>
+
+</div>
+
+</section>
+
+</div>
+
+<footer>
+
+<p>© 2026 Paul Baker | QA Test Analyst Portfolio</p>
+
+</footer>
+
 </body>
 </html>
